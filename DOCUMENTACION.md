@@ -80,30 +80,25 @@ docker compose up -d
 
 Recarga la página y verifica que el pedido siga presente. No uses `docker compose down --volumes`, porque ese comando borra los datos.
 
-## Capturas que debes añadir al PDF final
+## Capturas realizadas
 
-1. Página principal con catálogo de productos.
-2. Formulario y pedido visible en **Pedidos recientes**.
-3. Terminal con `docker compose ps` y el servicio en ejecución.
-4. Pedido visible después de recrear el contenedor.
-5. Si el profesor lo pide, vista de **Volumes** en Docker Desktop o salida de `docker volume ls`.
+1. [Página de la panadería con el pedido persistente](evidencias/web-despues.png).
+2. [Contenedor recreado y en ejecución en Docker Desktop](evidencias/docker-contenedor-despues.png).
+3. [Volumen `panaderia_pedidos_data` en Docker Desktop](evidencias/docker-volumen.png).
+4. [Vista inicial de la página](evidencias/web-pedidos-antes.png).
 
-Las capturas deben hacerse durante tu ejecución real; no se incluyen imágenes inventadas en esta documentación.
+Para comprobar la persistencia se creó el pedido de prueba `Marraqueta · 3 unidades`, se ejecutó `docker compose down` y después `docker compose up -d`. El ID del contenedor cambió de `4481c631a587` a `53ee6d7e382a`; al recargar la página el pedido seguía visible. El volumen permaneció como `panaderia_pedidos_data`.
 
 ## GitHub
 
-Crea un repositorio vacío en GitHub y copia su URL. Desde la carpeta `panaderia`:
+Repositorio público: <https://github.com/Chucharizard/pan-del-alba-docker>.
 
-```powershell
-git init
-git add .
-git commit -m "Práctica 2: panadería Flask con Docker y SQLite"
-git branch -M main
-git remote add origin URL_DE_TU_REPOSITORIO
-git push -u origin main
-```
+El historial se construyó por etapas:
 
-Sustituye `URL_DE_TU_REPOSITORIO` por la URL real. Si Git pide tu nombre o correo, configúralos con tus datos.
+1. `feat: crear web de panaderia con Flask y SQLite`
+2. `build: contenerizar la app y persistir pedidos en volumen`
+3. `docs: explicar arquitectura, prompts y prueba de volumen`
+4. `docs: añadir evidencias reales y PDF de entrega`
 
 ## Conclusión
 

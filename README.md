@@ -58,6 +58,6 @@ Si Compose ya está usando el puerto 5000, detenlo antes con `docker compose dow
 
 ## Documentación y entrega
 
-Lee [DOCUMENTACION.md](DOCUMENTACION.md) para el objetivo, los prompts por apartado, el plan de capturas y la explicación del volumen. El PDF de apoyo se guarda en `output/pdf/`. Añade tus capturas reales de Docker funcionando antes de entregar la versión definitiva.
+Lee [DOCUMENTACION.md](DOCUMENTACION.md) para el objetivo, los prompts por apartado, la prueba del volumen y las capturas reales. El PDF de entrega se guarda en `output/pdf/`.
 
-Para subirlo a GitHub, crea un repositorio en tu cuenta y sigue los comandos que aparecen en `DOCUMENTACION.md`. No subas el archivo `.db`: contiene los pedidos de prueba y está excluido por `.gitignore`.
+Repositorio: <https://github.com/Chucharizard/pan-del-alba-docker>. La base de datos local `.db` está excluida por `.gitignore`; las imágenes de evidencia sí forman parte del repositorio.
