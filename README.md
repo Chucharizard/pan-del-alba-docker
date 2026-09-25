@@ -15,10 +15,11 @@ Página de panadería hecha con Flask, plantillas Jinja2 y SQLite. Los pedidos s
 
 ## Ejecutar con Docker
 
-Abre una terminal **en esta carpeta `panaderia`** y asegúrate de que Docker Desktop esté iniciado:
+Abre una terminal **en esta carpeta `panaderia`** y asegúrate de que Docker Desktop esté iniciado. Primero construye la imagen y luego crea el contenedor:
 
 ```powershell
-docker compose up --build -d
+docker compose build
+docker compose up -d
 ```
 
 Abre <http://localhost:5000>. Para ver registros y estado:
@@ -58,6 +59,6 @@ Si Compose ya está usando el puerto 5000, detenlo antes con `docker compose dow
 
 ## Documentación y entrega
 
-Lee [DOCUMENTACION.md](DOCUMENTACION.md) para el objetivo, los prompts por apartado, la prueba del volumen y las capturas reales. El PDF de entrega se guarda en `output/pdf/`.
+Lee [DOCUMENTACION.md](DOCUMENTACION.md) para los ocho pasos de creación en Docker, los prompts por apartado, la prueba del volumen y las capturas reales. El PDF de entrega se guarda en `output/pdf/`.
 
 Repositorio: <https://github.com/Chucharizard/pan-del-alba-docker>. La base de datos local `.db` está excluida por `.gitignore`; las imágenes de evidencia sí forman parte del repositorio.
