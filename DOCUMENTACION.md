@@ -120,6 +120,8 @@ Compose creó el volumen con el nombre completo `panaderia_pedidos_data`. Ahí s
 
 La guía del docente usa Node.js y el puerto 3000 como ejemplo. Aquí se siguió **el mismo recorrido conceptual con la aplicación real de Pan del Alba**, hecha en Flask y publicada en el puerto 5000. Estos comandos se ejecutaron el 25/09/2026 desde PowerShell, dentro de `panaderia`. Se conservaron el servicio principal de Compose en `localhost:5000` y sus pedidos; la prueba directa usa `localhost:5001` para evitar conflictos de puertos.
 
+Las capturas 13 a 15 del anexo son imágenes reales de PowerShell. Documentan los intentos iniciales y sus correcciones: primero se ejecutó `docker build` desde `system32`, luego se cambió a la carpeta del proyecto; para el bind mount se definió `$static` antes de ejecutar Docker.
+
 ### Construcción directa de la imagen (pasos 2 y 3 de la guía)
 
 ```powershell
@@ -164,6 +166,8 @@ docker run --rm --mount "type=bind,source=$labStatic,target=/app/static,readonly
 ```
 
 **Salida real:** `BIND_MOUNT_OK True`. El contenedor temporal se eliminó solo al terminar por la opción `--rm`.
+
+La guía pide además editar el código para incluir el nombre completo, reiniciar un contenedor de desarrollo y consultar la respuesta actualizada. Esta captura comprueba que el archivo local está montado y accesible, pero no muestra ese cambio de código ni una respuesta con el nombre; no se presenta como evidencia de esa parte.
 
 ### Red personalizada y dos contenedores (paso 8)
 
@@ -281,6 +285,9 @@ Estos prompts se redactaron para guiar la construcción de esta práctica. Las c
 10. [Ficha de la imagen con nombre completo](evidencias/docker-imagen-detalle.png).
 11. [Imagen `panaderia:practica2` construida por terminal](evidencias/terminal-imagen-practica2.png).
 12. [Contenedores `panaderia-cli` y `panaderia-sonda`](evidencias/terminal-contenedores-practica2.png).
+13. [Terminal real: primer intento fallido y construcción correcta de la imagen](evidencias/terminal-build-real.png).
+14. [Terminal real: bind mount comprobado con `BIND_MOUNT_OK True`](evidencias/terminal-bind-real.png).
+15. [Terminal real: comunicación entre contenedores con HTTP 200](evidencias/terminal-red-real.png).
 
 Para comprobar la persistencia se creó el pedido de prueba `Marraqueta · 3 unidades`, se ejecutó `docker compose down` y después `docker compose up -d`. El ID del contenedor cambió de `4481c631a587` a `53ee6d7e382a`; al recargar la página el pedido seguía visible. El volumen permaneció como `panaderia_pedidos_data`.
 
