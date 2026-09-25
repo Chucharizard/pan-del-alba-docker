@@ -59,6 +59,6 @@ Si Compose ya está usando el puerto 5000, detenlo antes con `docker compose dow
 
 ## Documentación y entrega
 
-Lee [DOCUMENTACION.md](DOCUMENTACION.md) para los ocho pasos de creación en Docker, los prompts por apartado, la prueba del volumen y las capturas reales. El PDF de entrega se guarda en `output/pdf/`.
+Lee [DOCUMENTACION.md](DOCUMENTACION.md) para los ocho pasos de creación en Docker, los prompts por apartado, la prueba del volumen y las capturas reales. También incluye un recorrido adicional por terminal inspirado en la práctica 2 del docente: `docker build`, `docker run`, bind mount, red personalizada y Compose, adaptados a Flask. El PDF de entrega se guarda en `output/pdf/`.
 
 Repositorio: <https://github.com/Chucharizard/pan-del-alba-docker>. La base de datos local `.db` está excluida por `.gitignore`; las imágenes de evidencia sí forman parte del repositorio.

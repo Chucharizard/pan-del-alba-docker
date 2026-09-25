@@ -116,6 +116,85 @@ Compose creó el volumen con el nombre completo `panaderia_pedidos_data`. Ahí s
 
 ![Volumen de pedidos en Docker Desktop](evidencias/docker-volumen.png)
 
+## Recorrido adicional por terminal (referencia: práctica 2 del docente)
+
+La guía del docente usa Node.js y el puerto 3000 como ejemplo. Aquí se siguió **el mismo recorrido conceptual con la aplicación real de Pan del Alba**, hecha en Flask y publicada en el puerto 5000. Estos comandos se ejecutaron el 25/09/2026 desde PowerShell, dentro de `panaderia`. Se conservaron el servicio principal de Compose en `localhost:5000` y sus pedidos; la prueba directa usa `localhost:5001` para evitar conflictos de puertos.
+
+### Construcción directa de la imagen (pasos 2 y 3 de la guía)
+
+```powershell
+docker build -t panaderia:practica2 .
+docker image ls panaderia:practica2
+```
+
+**Resultado comprobado:** la construcción terminó correctamente y apareció `panaderia:practica2` (aproximadamente 198 MB). Docker leyó el `Dockerfile` de esta carpeta; no se creó un contenedor con `build`.
+
+![Ficha real de panaderia:practica2, imagen creada con docker build](evidencias/terminal-imagen-practica2.png)
+
+### Ejecución directa y prueba HTTP (paso 4)
+
+```powershell
+docker run -d --name panaderia-cli -p 5001:5000 -v panaderia_cli_datos:/app/data panaderia:practica2
+docker ps --filter name=panaderia-cli
+(Invoke-WebRequest -Uri 'http://localhost:5001' -UseBasicParsing).StatusCode
+```
+
+**Resultado comprobado:** `panaderia-cli` quedó en estado `Up`, publicó `5001:5000` y la solicitud devolvió **200**. El volumen `panaderia_cli_datos` quedó montado en `/app/data`. El contenedor original `panaderia-web-1` siguió funcionando en el puerto 5000.
+
+![Contenedores reales tras la ejecución por terminal](evidencias/terminal-contenedores-practica2.png)
+
+### Contexto de construcción y volumen (pasos 5 y 6)
+
+El archivo `.dockerignore` ya excluye `.venv/`, `__pycache__/`, bases `.db`, `data/` y `output/`, para no enviar archivos locales innecesarios al construir. La persistencia de pedidos se comprobó previamente con el volumen `panaderia_pedidos_data`; la ejecución directa creó otro volumen de prueba, `panaderia_cli_datos`.
+
+```powershell
+docker inspect panaderia-cli --format '{{json .Mounts}}'
+docker volume ls --filter name=panaderia_cli_datos
+```
+
+**Resultado comprobado:** Docker informó `Type: volume`, `Name: panaderia_cli_datos` y `Destination: /app/data`.
+
+### Bind mount para desarrollo (paso 7)
+
+Se montó la carpeta local `static/` en `/app/static` **solo para esta comprobación**, en modo de solo lectura; no se cambió el diseño ni se afirmó haber probado recarga en caliente.
+
+```powershell
+$labStatic = (Resolve-Path -LiteralPath 'static').Path
+docker run --rm --mount "type=bind,source=$labStatic,target=/app/static,readonly" panaderia:practica2 python -c "from pathlib import Path; print('BIND_MOUNT_OK', Path('/app/static/style.css').is_file())"
+```
+
+**Salida real:** `BIND_MOUNT_OK True`. El contenedor temporal se eliminó solo al terminar por la opción `--rm`.
+
+### Red personalizada y dos contenedores (paso 8)
+
+Se conectó el contenedor web a `panaderia-lab`. Un segundo contenedor, `panaderia-sonda`, comprobó que podía resolver `panaderia-cli` por nombre y hacer una petición HTTP dentro de la red. Aquí se usa HTTP en vez del ejemplo Redis/PONG de la guía, porque es una prueba propia de esta web.
+
+```powershell
+docker network create panaderia-lab
+docker network connect panaderia-lab panaderia-cli
+docker run -d --name panaderia-sonda --network panaderia-lab panaderia:practica2 sleep infinity
+docker exec panaderia-sonda python -c "import urllib.request; print('RED_OK_HTTP', urllib.request.urlopen('http://panaderia-cli:5000').status)"
+docker network inspect panaderia-lab --format '{{range .Containers}}{{.Name}} {{end}}'
+```
+
+**Salidas reales:** `RED_OK_HTTP 200` y los nombres `panaderia-sonda panaderia-cli` en la misma red. La sonda es un contenedor auxiliar de la demostración, no un componente necesario de la aplicación.
+
+La captura anterior de Docker Desktop muestra ambos contenedores en ejecución; la prueba de comunicación es la salida `RED_OK_HTTP 200` obtenida en la terminal. La captura, por sí sola, no demuestra la comunicación interna.
+
+### Docker Compose (paso 9, adaptado)
+
+El `docker-compose.yml` del proyecto ya orquesta el servicio `web`, el puerto 5000 y `pedidos_data`. La guía muestra dos servicios como ejemplo; **este archivo principal no incluye Redis ni pretende demostrar Compose multiservicio**. La comunicación entre dos contenedores se verificó en el paso de red anterior.
+
+```powershell
+docker compose config --quiet
+docker compose ps
+docker compose logs --tail 4 web
+```
+
+**Resultado comprobado:** `panaderia-web-1` aparece `Up` en `5000:5000` y los registros muestran respuestas HTTP 200. Los comandos `docker run` de arriba no sustituyen ni desmontan el servicio de Compose.
+
+Al repetir el recorrido, comprueba antes los nombres con `docker ps -a`: Docker no permite crear otro contenedor con el mismo nombre mientras `panaderia-cli` o `panaderia-sonda` existan.
+
 ## Prompts por apartado
 
 Estos prompts se redactaron para guiar la construcción de esta práctica. Las capturas de esta sección muestran los archivos y resultados obtenidos, **no** una conversación con IA. Si el profesor solicita pruebas de una conversación, deben añadirse capturas de los mensajes que realmente se enviaron.
@@ -200,6 +279,8 @@ Estos prompts se redactaron para guiar la construcción de esta práctica. Las c
 8. [Plantilla Jinja2 en el editor](evidencias/jinja-plantilla-codigo.png).
 9. [Imagen construida en Docker Desktop](evidencias/docker-imagen.png).
 10. [Ficha de la imagen con nombre completo](evidencias/docker-imagen-detalle.png).
+11. [Imagen `panaderia:practica2` construida por terminal](evidencias/terminal-imagen-practica2.png).
+12. [Contenedores `panaderia-cli` y `panaderia-sonda`](evidencias/terminal-contenedores-practica2.png).
 
 Para comprobar la persistencia se creó el pedido de prueba `Marraqueta · 3 unidades`, se ejecutó `docker compose down` y después `docker compose up -d`. El ID del contenedor cambió de `4481c631a587` a `53ee6d7e382a`; al recargar la página el pedido seguía visible. El volumen permaneció como `panaderia_pedidos_data`.
 
