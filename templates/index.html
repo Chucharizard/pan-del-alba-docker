@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pan del Alba: pan y dulces hechos cada mañana.">
+  <title>Pan del Alba | Panadería artesanal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#inicio"><span class="brand-mark">✦</span> Pan del Alba</a>
+    <nav aria-label="Navegación principal">
+      <a href="#productos">Productos</a>
+      <a href="#hacer-pedido">Hacer pedido</a>
+      <a href="#pedidos">Pedidos</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">HORNEADO CON CARIÑO, CADA MAÑANA</p>
+        <h1>El sabor de<br><em>volver a casa.</em></h1>
+        <p class="hero-description">Pan crujiente, dulces recién hechos y ese aroma que hace que cualquier día empiece mejor.</p>
+        <a class="button button-primary" href="#productos">Explorar productos <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="bread bread-one">🥐</div>
+        <div class="bread bread-two">🥖</div>
+        <div class="bread bread-three">🍞</div>
+        <div class="art-caption">Recién hecho · Todos los días</div>
+      </div>
+    </section>
+
+    <section class="products section-wrap" id="productos">
+      <div class="section-heading">
+        <div><p class="eyebrow">NUESTROS FAVORITOS</p><h2>Algo rico para cada momento.</h2></div>
+        <p>Preparados con ingredientes sencillos y mucho cuidado.</p>
+      </div>
+      <div class="product-grid">
+        {% for producto in productos %}
+        <article class="product-card">
+          <div class="product-image product-image-{{ loop.index }}" aria-hidden="true"><span>{{ producto.icono }}</span></div>
+          <div class="product-info">
+            <div class="product-title"><h3>{{ producto.nombre }}</h3><strong>Bs {{ producto.precio }}</strong></div>
+            <p>{{ producto.descripcion }}</p>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="order-section" id="hacer-pedido">
+      <div class="order-layout section-wrap">
+        <div class="order-copy">
+          <p class="eyebrow">TU PEDIDO</p>
+          <h2>Elige tu favorito.<br><em>Nosotros lo preparamos.</em></h2>
+          <p>Esta es una demostración para la práctica. Al enviar el formulario, tu pedido se guarda en SQLite.</p>
+          <div class="order-note"><span aria-hidden="true">✦</span> Los pedidos permanecen guardados gracias al volumen de Docker.</div>
+        </div>
+        <form class="order-form" action="{{ url_for('guardar_pedido') }}" method="post">
+          <h3>Hacer un pedido</h3>
+          {% if error %}<p class="alert error" role="alert">{{ error }}</p>{% endif %}
+          <label for="cliente">Tu nombre</label>
+          <input id="cliente" name="cliente" type="text" maxlength="80" required placeholder="Ej. Ana López" value="{{ valores.get('cliente', '') }}">
+          <label for="producto">Producto</label>
+          <select id="producto" name="producto" required>
+            <option value="">Selecciona un producto</option>
+            {% for producto in productos %}
+            <option value="{{ producto.id }}" {% if valores.get('producto') == producto.id %}selected{% endif %}>{{ producto.nombre }} · Bs {{ producto.precio }}</option>
+            {% endfor %}
+          </select>
+          <label for="cantidad">Cantidad</label>
+          <input id="cantidad" name="cantidad" type="number" min="1" max="50" required value="{{ valores.get('cantidad', 1) }}">
+          <button class="button button-primary" type="submit">Guardar pedido <span aria-hidden="true">↗</span></button>
+        </form>
+      </div>
+    </section>
+
+    <section class="saved-orders section-wrap" id="pedidos">
+      <div class="section-heading">
+        <div><p class="eyebrow">DATOS GUARDADOS</p><h2>Pedidos recientes</h2></div>
+        <p>Estos registros se leen desde la base de datos SQLite.</p>
+      </div>
+      {% if exito %}<p class="alert success" role="status">¡Pedido guardado! Recréa el contenedor para comprobar que sigue aquí.</p>{% endif %}
+      {% if pedidos %}
+      <div class="orders-list">
+        {% for pedido in pedidos %}
+        <div class="order-row"><div><strong>{{ pedido.cliente }}</strong><span>{{ pedido.producto }} · {{ pedido.cantidad }} unidad{% if pedido.cantidad != 1 %}es{% endif %}</span></div><div class="order-meta"><strong>Bs {{ pedido.total }}</strong><span>{{ pedido.fecha }}</span></div></div>
+        {% endfor %}
+      </div>
+      {% else %}<p class="empty-state">Todavía no hay pedidos. ¡Haz el primero!</p>{% endif %}
+    </section>
+  </main>
+
+  <footer><span>✦ Pan del Alba</span><span>Hecho para la práctica de Docker + Flask + SQLite.</span></footer>
+</body>
+</html>
